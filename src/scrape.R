@@ -5,10 +5,12 @@
 #install.packages("rvest")
 #install.packages("xml2")
 #install.packages("mefa")
+#install.packages("measurements")
 library('rvest')
 library('xml2')
 library('tidyverse')
 library('purrr')
+library(measurements)
 
 # Specifying and reading url ---------------
 # First page
@@ -142,6 +144,23 @@ liberty$latitude <-
 
 liberty$longitude <- 
   gsub(pattern = "^\\s+|\\s+$", replacement = "", liberty$longitude)
+
+#Degrees Minutes.m to Decimal Minutes
+liberty$lat<-gsub('°','',liberty$latitude)
+liberty$lat <-gsub('S ',"-",liberty$lat)
+liberty$lat <-gsub('N ',"",liberty$lat)
+liberty$lat<-gsub('\\s+$',"", liberty$lat)
+liberty$lat<-gsub('\'','', liberty$lat)
+liberty$lat<-gsub('\\"',"",liberty$lat)
+
+liberty$long<-gsub('°','',liberty$longitude)
+liberty$long <-gsub('W ',"-",liberty$long)
+liberty$long <-gsub('E ',"",liberty$long)
+liberty$long<-gsub('\\s+$',"", liberty$long)
+
+liberty$lat <- measurements::conv_unit(liberty$lat, from = 'deg_dec_min', to = 'dec_deg')
+liberty$long <- measurements::conv_unit(liberty$long, from = 'deg_dec_min', to = 'dec_deg')
+
 
 # Save  ------------
 saveRDS(liberty, "liberty.rds")
